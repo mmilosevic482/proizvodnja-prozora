@@ -1,0 +1,70 @@
+models:
+  Klijent:
+    user_id: id foreign:users nullable
+    naziv_firme: string
+    adresa: string
+    telefon: string
+    pib: string unique nullable
+    napomena: text nullable
+
+  Narudzbina:
+    klijent_id: id foreign:klijenti
+    user_id: id foreign:users nullable
+    broj_narudzbine: string unique
+    datum_narudzbine: date
+    rok_isporuke: date
+    status: string default:'nova'
+    ukupna_cena: decimal:10,2
+    napomena: text nullable
+
+  Proizvod:
+    naziv: string
+    opis: text
+    tip: string
+    standardna_sirina: decimal:5,2 nullable
+    standardna_visina: decimal:5,2 nullable
+    cena_po_m2: decimal:8,2
+    aktivna: boolean default:true
+
+  StavkaNarudzbine:
+    narudzbina_id: id foreign:narudzbine
+    proizvod_id: id foreign:proizvodi
+    sirina: decimal:5,2
+    visina: decimal:5,2
+    kolicina: integer
+    boja: string nullable
+    napomena: text nullable
+    cena: decimal:10,2
+
+  Materijal:
+    naziv: string
+    tip: string
+    jedinica_mere: string
+    trenutna_kolicina: decimal:10,2
+    minimalna_kolicina: decimal:10,2
+    cena_po_jedinici: decimal:8,2
+
+  ProizvodniZadatak:
+    stavka_narudzbine_id: id foreign:stavke_narudzbine
+    user_id: id foreign:users
+    operacija: string
+    datum_pocetka: datetime nullable
+    datum_zavrsetka: datetime nullable
+    status: string default:'na_cekanju'
+    napomena: text nullable
+
+controllers:
+  Klijent:
+    resource: all
+
+  Narudzbina:
+    resource: all
+
+  Proizvod:
+    resource: all
+
+  Materijal:
+    resource: all
+
+  ProizvodniZadatak:
+    resource: all

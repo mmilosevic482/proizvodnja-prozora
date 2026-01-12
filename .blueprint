@@ -1,0 +1,39 @@
+created:
+    - app/Http/Controllers/KlijentController.php
+    - app/Http/Controllers/NarudzbinaController.php
+    - app/Http/Controllers/ProizvodController.php
+    - app/Http/Controllers/MaterijalController.php
+    - app/Http/Controllers/ProizvodniZadatakController.php
+    - database/factories/KlijentFactory.php
+    - database/factories/NarudzbinaFactory.php
+    - database/factories/ProizvodFactory.php
+    - database/factories/StavkaNarudzbineFactory.php
+    - database/factories/MaterijalFactory.php
+    - database/factories/ProizvodniZadatakFactory.php
+    - database/migrations/2026_01_11_164330_create_klijents_table.php
+    - database/migrations/2026_01_11_164331_create_narudzbinas_table.php
+    - database/migrations/2026_01_11_164332_create_proizvods_table.php
+    - database/migrations/2026_01_11_164333_create_stavka_narudzbines_table.php
+    - database/migrations/2026_01_11_164334_create_materijals_table.php
+    - database/migrations/2026_01_11_164335_create_proizvodni_zadataks_table.php
+    - app/Models/Klijent.php
+    - app/Models/Narudzbina.php
+    - app/Models/Proizvod.php
+    - app/Models/StavkaNarudzbine.php
+    - app/Models/Materijal.php
+    - app/Models/ProizvodniZadatak.php
+    - tests/Feature/Http/Controllers/KlijentControllerTest.php
+    - tests/Feature/Http/Controllers/NarudzbinaControllerTest.php
+    - tests/Feature/Http/Controllers/ProizvodControllerTest.php
+    - tests/Feature/Http/Controllers/MaterijalControllerTest.php
+    - tests/Feature/Http/Controllers/ProizvodniZadatakControllerTest.php
+updated:
+    - routes/web.php
+models:
+    User: { name: string, email: string, email_verified_at: 'timestamp nullable default:NULL', password: string, remember_token: 'string:100 nullable default:NULL' }
+    Klijent: { user_id: 'id foreign:users nullable', naziv_firme: string, adresa: string, telefon: string, pib: 'string unique nullable', napomena: 'text nullable' }
+    Narudzbina: { klijent_id: 'id foreign:klijenti', user_id: 'id foreign:users nullable', broj_narudzbine: 'string unique', datum_narudzbine: date, rok_isporuke: date, status: "string default:'nova'", ukupna_cena: 'decimal:10,2', napomena: 'text nullable' }
+    Proizvod: { naziv: string, opis: text, tip: string, standardna_sirina: 'decimal:5,2 nullable', standardna_visina: 'decimal:5,2 nullable', cena_po_m2: 'decimal:8,2', aktivna: 'boolean default:true' }
+    StavkaNarudzbine: { narudzbina_id: 'id foreign:narudzbine', proizvod_id: 'id foreign:proizvodi', sirina: 'decimal:5,2', visina: 'decimal:5,2', kolicina: integer, boja: 'string nullable', napomena: 'text nullable', cena: 'decimal:10,2' }
+    Materijal: { naziv: string, tip: string, jedinica_mere: string, trenutna_kolicina: 'decimal:10,2', minimalna_kolicina: 'decimal:10,2', cena_po_jedinici: 'decimal:8,2' }
+    ProizvodniZadatak: { stavka_narudzbine_id: 'id foreign:stavke_narudzbine', user_id: 'id foreign:users', operacija: string, datum_pocetka: 'datetime nullable', datum_zavrsetka: 'datetime nullable', status: "string default:'na_cekanju'", napomena: 'text nullable' }
