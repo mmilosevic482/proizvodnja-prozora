@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $stats = [
             'klijenti' => Klijent::count(),
             'proizvodi' => Proizvod::where('aktivna', true)->count(),
-            'narudzbine' => Narudzbina::where('status', '!=', 'zavrsena')->count(),
+            'narudzbine' => Narudzbina::whereIn('status', ['nova', 'u_obradi'])->count(),
             'zadaci' => ProizvodniZadatak::where('status', 'na_cekanju')->count(),
             'ukupna_vrednost' => Narudzbina::where('status', '!=', 'otkazana')->sum('ukupna_cena'),
         ];

@@ -43,9 +43,10 @@ class Narudzbina extends Model
         ];
     }
 
-    public function klijent(): BelongsTo
+    // app/Models/Narudzbina.php
+    public function klijent()
     {
-        return $this->belongsTo(Klijent::class);
+        return $this->belongsTo(Klijent::class, 'klijent_id', 'id');
     }
 
     public function user(): BelongsTo

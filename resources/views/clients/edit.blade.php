@@ -13,7 +13,8 @@
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('clients.update', ['client' => $klijent->id]) }}" method="POST">
+            <!-- Prosleđujemo direktno model $klijent -->
+            <form action="{{ route('clients.update', $klijent) }}" method="POST">
                 @csrf
                 @method('PUT')
 

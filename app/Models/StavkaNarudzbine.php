@@ -45,8 +45,9 @@ class StavkaNarudzbine extends Model
 
     public function narudzbina(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\StavkaNarudzbine::class);
+    return $this->belongsTo(Narudzbina::class);
     }
+
 
     public function proizvod(): BelongsTo
     {

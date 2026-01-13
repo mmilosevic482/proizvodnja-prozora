@@ -9,11 +9,8 @@ class Materijal extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    protected $table = 'materijals'; // mora da se poklapa sa tabelom u bazi
+
     protected $fillable = [
         'naziv',
         'tip',
@@ -21,20 +18,14 @@ class Materijal extends Model
         'trenutna_kolicina',
         'minimalna_kolicina',
         'cena_po_jedinici',
+        'opis',
+        'slika',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'id' => 'integer',
-            'trenutna_kolicina' => 'decimal:2',
-            'minimalna_kolicina' => 'decimal:2',
-            'cena_po_jedinici' => 'decimal:2',
-        ];
-    }
+    protected $casts = [
+        'id' => 'integer',
+        'trenutna_kolicina' => 'decimal:2',
+        'minimalna_kolicina' => 'decimal:2',
+        'cena_po_jedinici' => 'decimal:2',
+    ];
 }

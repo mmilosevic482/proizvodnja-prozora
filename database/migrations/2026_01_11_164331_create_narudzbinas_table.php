@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('narudzbinas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('klijent_id')->constrained('klijentis');
+            $table->foreignId('klijent_id')->constrained('klijents');
             $table->foreignId('user_id')->nullable()->constrained();
             $table->string('broj_narudzbine')->unique();
             $table->date('datum_narudzbine');

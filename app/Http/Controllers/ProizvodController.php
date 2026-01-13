@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Proizvod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProizvodController extends Controller
 {
@@ -19,23 +21,33 @@ class ProizvodController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'naziv' => 'required|string|max:255',
-            'opis' => 'nullable|string',
-            'tip' => 'required|string|in:pvc,aluminijum,drvo',
-            'standardna_sirina' => 'nullable|numeric|min:0',
-            'standardna_visina' => 'nullable|numeric|min:0',
-            'cena_po_m2' => 'required|numeric|min:0',
-        ]);
+{
+    $validated = $request->validate([
+        'naziv' => 'required|string|max:255',
+        'opis' => 'nullable|string',
+        'tip' => 'required|string|in:pvc,aluminijum,drvo',
+        'standardna_sirina' => 'nullable|numeric|min:0',
+        'standardna_visina' => 'nullable|numeric|min:0',
+        'cena_po_m2' => 'required|numeric|min:0',
+        'slika' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        $validated['aktivna'] = true;
+    $validated['aktivna'] = true;
 
-        Proizvod::create($validated);
-
-        return redirect()->route('proizvods.index')
-            ->with('success', 'Proizvod je uspešno dodat.');
+    if ($request->hasFile('slika') && $request->file('slika')->isValid()) {
+        $file = $request->file('slika');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('proizvodi'), $filename);
+        $validated['slika'] = 'proizvodi/' . $filename;
     }
+
+    Proizvod::create($validated);
+
+    return redirect()->route('proizvods.index')
+                     ->with('success', 'Proizvod je uspešno dodat.');
+}
+
+
 
     public function show(Proizvod $proizvod)
     {

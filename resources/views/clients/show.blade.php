@@ -7,9 +7,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Klijent: {{ $klijent->naziv_firme }}</h2>
         <div class="d-flex gap-2">
-            <!-- SAMO ADMIN/MENADŽER VIDI OVO -->
-            @if(auth()->user()->canEdit())
-                <a href="{{ route('clients.edit', ['client' => $klijent->id]) }}" class="btn btn-warning">
+            {{-- Dugme za edit samo ako korisnik može i ruta postoji --}}
+            @if(auth()->user()->canEdit() && Route::has('clients.edit'))
+                <a href="{{ route('clients.edit', ['klijent' => $klijent->id]) }}" class="btn btn-warning">
                     <i class="fas fa-edit"></i> Izmeni
                 </a>
             @endif
@@ -62,7 +62,7 @@
                     <h5 class="mb-0">Brze akcije</h5>
                 </div>
                 <div class="card-body">
-                    <!-- OVO MOŽE DA VIDI SVAKO KO MOŽE DA NARUČI -->
+                    {{-- Dugme za novu narudžbinu --}}
                     @if(auth()->user()->canEdit() || auth()->user()->role === 'klijent')
                         <a href="{{ route('narudzbine.create') }}?klijent_id={{ $klijent->id }}"
                            class="btn btn-primary w-100 mb-2">
@@ -70,9 +70,9 @@
                         </a>
                     @endif
 
-                    <!-- SAMO ADMIN/MENADŽER VIDI OVO -->
-                    @if(auth()->user()->canEdit())
-                        <form action="{{ route('clients.destroy', ['client' => $klijent->id]) }}" method="POST"
+                    {{-- Dugme za brisanje samo za admin/menadžer --}}
+                    @if(auth()->user()->canEdit() && Route::has('clients.destroy'))
+                        <form action="{{ route('clients.destroy', ['klijent' => $klijent->id]) }}" method="POST"
                               onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovog klijenta?')">
                             @csrf
                             @method('DELETE')
