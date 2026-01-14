@@ -375,12 +375,12 @@
                     </a>
                 </div>
 
-                <div class="nav-item">
+                {{-- <div class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fas fa-clipboard-check"></i>
                         Контрола квалитета
                     </a>
-                </div>
+                </div> --}}
 
                 <!-- Management Section -->
                 <div class="nav-section-title">Управљање</div>
@@ -392,20 +392,20 @@
                     </a>
                 </div>
 
-                @if(auth()->user()->canEdit())
+                {{-- @if(auth()->user()->canEdit())
                 <div class="nav-item">
                     <a href="{{ route('proizvodni-zadaci.index') }}" class="nav-link {{ request()->is('proizvodni-zadaci*') ? 'active' : '' }}">
                         <i class="fas fa-tasks"></i>
                         Задачи
                     </a>
                 </div>
-                @endif
+                @endif --}}
 
                 <!-- User Section -->
                 {{-- <div class="nav-section-title">Корисник</div> --}}
 
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('profile.show') }}" class="nav-link">
                         <i class="fas fa-user-circle"></i>
                         Профил
                     </a>

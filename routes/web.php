@@ -10,6 +10,7 @@ use App\Http\Controllers\MaterijalController;
 use App\Http\Controllers\ProizvodniZadatakController;
 use App\Http\Controllers\KatalogController;
 
+
 // Početna strana
 Route::get('/', function () {
     return view('welcome');
@@ -120,4 +121,12 @@ Route::get('/materijali/{materijal}', [MaterijalController::class, 'show'])->nam
         Route::delete('/proizvodni-zadaci/{proizvodni_zadatak}', [ProizvodniZadatakController::class, 'destroy'])->name('proizvodni-zadaci.destroy');
     });
 
+});
+use App\Http\Controllers\ProfileController;
+
+// Профил руте са middleware
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });

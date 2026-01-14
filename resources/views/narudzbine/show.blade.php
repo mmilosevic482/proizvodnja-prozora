@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Narudžbina: {{ $narudzbina->broj_narudzbine ?? 'N/A' }}</h2>
         <div class="d-flex gap-2">
-            @if(auth()->user()->canEdit())
+            @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'menadzer'))
                 <a href="{{ route('narudzbine.edit', $narudzbina) }}" class="btn btn-warning">
                     <i class="fas fa-edit"></i> Izmeni
                 </a>
@@ -27,15 +27,15 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="proizvodnja-tab" data-bs-toggle="tab"
-                    data-bs-target="#proizvodnja" type="button" role="tab">
-                <i class="fas fa-industry"></i> Proizvodnja
+            <button class="nav-link" id="stavke-tab" data-bs-toggle="tab"
+                    data-bs-target="#stavke" type="button" role="tab">
+                <i class="fas fa-window-maximize"></i> Stavke ({{ $stavke->count() }})
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="kvalitet-tab" data-bs-toggle="tab"
-                    data-bs-target="#kvalitet" type="button" role="tab">
-                <i class="fas fa-check-circle"></i> Kvalitet
+            <button class="nav-link" id="proizvodnja-tab" data-bs-toggle="tab"
+                    data-bs-target="#proizvodnja" type="button" role="tab">
+                <i class="fas fa-industry"></i> Proizvodnja
             </button>
         </li>
     </ul>
@@ -62,6 +62,9 @@
                                             {{ $narudzbina->klijent->naziv_firme }}
                                             @if($narudzbina->klijent->telefon)
                                                 <br><small class="text-muted">Tel: {{ $narudzbina->klijent->telefon }}</small>
+                                            @endif
+                                            @if($narudzbina->klijent->adresa)
+                                                <br><small class="text-muted">{{ $narudzbina->klijent->adresa }}</small>
                                             @endif
                                         @else
                                             <span class="text-muted">Nepoznato</span>
@@ -148,30 +151,50 @@
                             <h5 class="mb-0">Brze akcije</h5>
                         </div>
                         <div class="card-body">
-                            @if(auth()->user()->canEdit())
+                            @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'menadzer'))
                                 <!-- Promena statusa -->
                                 <div class="mb-3">
                                     <label class="form-label">Promeni status:</label>
                                     <div class="d-grid gap-2">
                                         @if($narudzbina->status == 'nova')
-                                            <a href="{{ route('narudzbine.edit', $narudzbina) }}" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-play"></i> Počni obradu
-                                            </a>
+                                            <form action="{{ route('narudzbine.update', $narudzbina) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="u_obradi">
+                                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                    <i class="fas fa-play"></i> Počni obradu
+                                                </button>
+                                            </form>
                                         @endif
 
                                         @if($narudzbina->status == 'u_obradi')
-                                            <a href="{{ route('narudzbine.edit', $narudzbina) }}" class="btn btn-success btn-sm">
-                                                <i class="fas fa-check"></i> Označi kao završeno
-                                            </a>
+                                            <form action="{{ route('narudzbine.update', $narudzbina) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="zavrsena">
+                                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                                    <i class="fas fa-check"></i> Označi kao završeno
+                                                </button>
+                                            </form>
                                         @endif
 
                                         @if(in_array($narudzbina->status, ['nova', 'u_obradi']))
-                                            <a href="{{ route('narudzbine.edit', $narudzbina) }}" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-times"></i> Otkaži narudžbinu
-                                            </a>
+                                            <form action="{{ route('narudzbine.update', $narudzbina) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="otkazana">
+                                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                                    <i class="fas fa-times"></i> Otkaži narudžbinu
+                                                </button>
+                                            </form>
                                         @endif
                                     </div>
                                 </div>
+
+                                <!-- Edit -->
+                                <a href="{{ route('narudzbine.edit', $narudzbina) }}" class="btn btn-warning w-100 mb-2">
+                                    <i class="fas fa-edit"></i> Izmeni narudžbinu
+                                </a>
 
                                 <!-- Brisanje -->
                                 <form action="{{ route('narudzbine.destroy', $narudzbina) }}"
@@ -194,7 +217,65 @@
             </div>
         </div>
 
-        <!-- TAB 2: PROIZVODNJA -->
+        <!-- TAB 2: STAVKE -->
+        <div class="tab-pane fade" id="stavke" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Stavke narudžbine ({{ $stavke->count() }})</h5>
+                </div>
+                <div class="card-body">
+                    @if($stavke->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Dimenzije</th>
+                                        <th>Količina</th>
+                                        <th>Boja</th>
+                                        <th>Napomena</th>
+                                        <th>Cena po komadu</th>
+                                        <th>Ukupno</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($stavke as $index => $stavka)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $stavka->sirina }} × {{ $stavka->visina }} cm</td>
+                                        <td>{{ $stavka->kolicina }}</td>
+                                        <td>
+                                            <span class="badge" style="background-color: #f0f0f0; color: #333;">
+                                                {{ $stavka->boja }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small>{{ $stavka->napomena }}</small>
+                                        </td>
+                                        <td>{{ number_format($stavka->cena / $stavka->kolicina, 2) }} RSD</td>
+                                        <td class="fw-bold">{{ number_format($stavka->cena, 2) }} RSD</td>
+                                    </tr>
+                                    @endforeach
+                                    <tr class="table-light">
+                                        <td colspan="6" class="text-end fw-bold">UKUPNO:</td>
+                                        <td class="fw-bold fs-5">
+                                            {{ number_format($stavke->sum('cena'), 2) }} RSD
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Ova narudžbina nema stavki.
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PROIZVODNJA -->
         <div class="tab-pane fade" id="proizvodnja" role="tabpanel">
             <div class="card">
                 <div class="card-header">
@@ -215,34 +296,6 @@
                         <div class="alert alert-warning">
                             <i class="fas fa-clock"></i>
                             Čeka se početak proizvodnje
-                        </div>
-                    @endif
-
-                    <!-- OVDE BIŠE DODAO LISTU STAVKI (StavkaNarudzbine) -->
-                    <div class="mt-4">
-                        <h6>Stavke narudžbine:</h6>
-                        <p class="text-muted">Funkcionalnost za stavke će biti dodata u narednoj verziji.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: KVALITET -->
-        <div class="tab-pane fade" id="kvalitet" role="tabpanel">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Kontrola kvaliteta</h5>
-                </div>
-                <div class="card-body">
-                    @if($narudzbina->status == 'zavrsena')
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-double"></i>
-                            Proizvod je prošao kontrolu kvaliteta
-                        </div>
-                    @else
-                        <div class="alert alert-secondary">
-                            <i class="fas fa-hourglass-half"></i>
-                            Kontrola kvaliteta će biti izvršena po završetku proizvodnje
                         </div>
                     @endif
                 </div>
