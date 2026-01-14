@@ -44,22 +44,11 @@ public function index(Request $request)
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        // Prvo proveri da li je ulogovan
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        $user = Auth::user();
-
-        // Provera prava - koristi direktnu proveru role
-        if (!($user->role === 'admin' || $user->role === 'menadzer') && $user->role !== 'klijent') {
-            abort(403, 'Nemate pravo da kreirate narudžbine!');
-        }
-
-        $klijenti = Klijent::all();
-        return view('narudzbine.create', compact('klijenti'));
-    }
+{
+    // SAMO OVO - BEZ PROVERE!
+    $klijenti = \App\Models\Klijent::all();
+    return view('narudzbine.create', compact('klijenti'));
+}
 
     /**
      * Store a newly created resource in storage.

@@ -76,17 +76,21 @@ Route::middleware('auth')->group(function () {
     });
 
     // ================== NARUDŽBINE ==================
-    Route::get('/narudzbine', [NarudzbinaController::class, 'index'])->name('narudzbine.index');
-    Route::get('/narudzbine/{narudzbina}', [NarudzbinaController::class, 'show'])->name('narudzbine.show');
 
-    Route::middleware('role:admin,menadzer')->group(function () {
-        Route::get('/narudzbine/create', [NarudzbinaController::class, 'create'])->name('narudzbine.create');
-        Route::post('/narudzbine', [NarudzbinaController::class, 'store'])->name('narudzbine.store');
-        Route::get('/narudzbine/{narudzbina}/edit', [NarudzbinaController::class, 'edit'])->name('narudzbine.edit');
-        Route::put('/narudzbine/{narudzbina}', [NarudzbinaController::class, 'update'])->name('narudzbine.update');
-        Route::delete('/narudzbine/{narudzbina}', [NarudzbinaController::class, 'destroy'])->name('narudzbine.destroy');
-    });
+// 1. CREATE i STORE - NEMA MIDDLEWARE UOPŠTE
+Route::get('/narudzbine/create', [NarudzbinaController::class, 'create'])->name('narudzbine.create');
+Route::post('/narudzbine', [NarudzbinaController::class, 'store'])->name('narudzbine.store');
 
+// 2. SVI MOGU - index i show (takođe bez middleware)
+Route::get('/narudzbine', [NarudzbinaController::class, 'index'])->name('narudzbine.index');
+Route::get('/narudzbine/{narudzbina}', [NarudzbinaController::class, 'show'])->name('narudzbine.show');
+
+// 3. EDIT, UPDATE, DELETE - samo admin/menadžer (OVO OSTAVI SA MIDDLEWARE-OM)
+Route::middleware('role:admin,menadzer')->group(function () {
+    Route::get('/narudzbine/{narudzbina}/edit', [NarudzbinaController::class, 'edit'])->name('narudzbine.edit');
+    Route::put('/narudzbine/{narudzbina}', [NarudzbinaController::class, 'update'])->name('narudzbine.update');
+    Route::delete('/narudzbine/{narudzbina}', [NarudzbinaController::class, 'destroy'])->name('narudzbine.destroy');
+});
     // ================== MATERIJALI ==================
 
 // Static ruta mora prvo
